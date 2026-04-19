@@ -2,22 +2,26 @@
 ; Gabriel Amorocho Goenaga (300404048) 
 ; Maximus Teo (300134556)
 ; ------------------------
-; How to run with Racket on terminal: racket / (require "main.scm") / (function_name)
+; How to run: racket / (require "main.scm") / (function_name)
+; Write output to file: (with-output-to-file "output.txt" (lambda () (display(time(gale-shapley RLIST PLIST '() #:exists 'replace)))))
 
 #lang racket
 
 (require "rpReader.scm")
 
-(provide gale-shapley gale-shapley-print)
+(provide RLIST PLIST gale-shapley gale-shapley-print offer evaluate)
+
+(provide get-resident-info get-program-info rank matched? get-match add-resident-to-match)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Given functions
 
-(read-residents "assets/residentSmall.csv")
-(read-programs "assets/programSmall.csv")
+; if want to display csv content
+;(read-residents "assets/residentSmall.csv")
+;(read-programs "assets/programSmall.csv")
 
-(define RLIST (read-residents "assets/residentSmall.csv"))
-(define PLIST (read-programs "assets/programSmall.csv"))
+(define RLIST (read-residents "assets/residents4000.csv"))
+(define PLIST (read-programs "assets/programs4000.csv"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Helper functions
@@ -159,24 +163,23 @@
 ; Main functions
 
 (define (gale-shapley rlist plist matches)
-  (if (null? rlist)
-      matches
-      (gale-shapley
-        (cdr rlist)
-        plist
-        (offer (car rlist) rlist plist matches))))
+  (let loop ((unprocessed rlist) (current-matches matches))
+    (if (null? unprocessed)
+        current-matches
+        (loop (cdr unprocessed)
+              (offer (car unprocessed) rlist plist current-matches)))))
 
 (define (offer rinfo rlist plist matches)
-  (let loop ((prefs (cadddr rinfo)))
-    (cond
-      ((null? prefs) matches)
-      (else
-        (let* ((pid (car prefs))
-               (pinfo (get-program-info pid plist))
-               (new-matches (evaluate rinfo pinfo rlist plist matches)))
-          (if (equal? new-matches matches)
-              (loop (cdr prefs)) ; rejected → try next
-              new-matches))))))
+    (let loop ((prefs (cadddr rinfo)))
+        (cond
+            ((null? prefs) matches)
+        (else
+            (let* ((pid (car prefs))
+            (pinfo (get-program-info pid plist))
+            (new-matches (evaluate rinfo pinfo rlist plist matches)))
+                (if (equal? new-matches matches)
+                    (loop (cdr prefs)) ; rejected → try next
+                    new-matches))))))
 
 (define (evaluate rinfo pinfo rlist plist matches)
   (let* ((pid (car pinfo))
@@ -186,6 +189,9 @@
          (quota (caddr pinfo)))
 
     (cond
+      ;; resident not ranked by program -> reject
+      ((not r-rank) matches)
+
       ;; no match yet → create new
       ((not match)
        (cons (list pid (list (cons rid r-rank))) matches))
