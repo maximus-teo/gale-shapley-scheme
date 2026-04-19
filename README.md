@@ -1,6 +1,6 @@
 # Gale-Shapley / McVitie-Wilson Algorithm in Scheme
 
-Solving the stable matching problem for residents and medical programs. McVitie-Wilson is used since Scheme is highly suitable for recursion. `main.scm` contains the main logic and `rpReader.scm` helps read CSV files (not included in this repo).
+Solving the stable matching problem for residents and medical programs. McVitie-Wilson is used since Scheme is highly suitable for recursion. `main.scm` contains the main logic and `rpReader.scm` helps read CSV files.
 
 ## Gale-Shapley
 * Breadth-first

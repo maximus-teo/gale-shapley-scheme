@@ -8,18 +8,10 @@
 #lang racket
 
 (require "rpReader.scm")
-
 (provide RLIST PLIST gale-shapley gale-shapley-print offer evaluate)
-
 (provide get-resident-info get-program-info rank matched? get-match add-resident-to-match)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Given functions
-
-; if want to display csv content
-;(read-residents "assets/residentSmall.csv")
-;(read-programs "assets/programSmall.csv")
-
+;; Load CSV files
 (define RLIST (read-residents "assets/residents4000.csv"))
 (define PLIST (read-programs "assets/programs4000.csv"))
 
@@ -28,8 +20,8 @@
 
 (define (get-resident-info rid rlist)
 	(cond
-	 ((null? rlist) #f)	;not found
-	 ((= rid (car (car rlist))) (car rlist))	;match found
+	 ((null? rlist) #f)	; not found
+	 ((= rid (car (car rlist))) (car rlist))	; match found
 	 (else (get-resident-info rid (cdr rlist)))))
 
 
@@ -40,7 +32,7 @@
 	 (else (get-program-info pid (cdr plist)))))
 
 
-;Usage probably in the form (rank (rid (get-program-info pid)))
+;; Usage probably in the form (rank (rid (get-program-info pid)))
 (define (rank rid pinfo)
 	(define (find-index lst idx)
 	 (cond
@@ -50,7 +42,7 @@
 	(find-index (cadddr pinfo) 0))
 	
 
-;Usage example: (matched? 403 (gale-shapely RLIST PLIST '()))
+;; Usage example: (matched? 403 (gale-shapely RLIST PLIST '()))
 (define (matched? rid matches)
 	(cond
 	 ((null? matches) #f)
@@ -63,12 +55,13 @@
 
 (define (get-match pid matches)
 	(cond
-	 ((null? matches) #f)	;not found
-	 ((string=? pid (car (car matches))) (car matches))	;match found
+	 ((null? matches) #f)	; not found
+	 ((string=? pid (car (car matches))) (car matches))	; match found
 	 (else (get-match pid (cdr matches)))))
 
 
-;adding a new resident to match. reverse order insertion according to p rol so that least preferred is always added first in the list
+;; adding a new resident to match. reverse order insertion according to p rol
+;; so that least preferred is always added first in the list
 (define (add-resident-to-match pair match)
   (define (insert lst)
     (cond
@@ -178,7 +171,7 @@
             (pinfo (get-program-info pid plist))
             (new-matches (evaluate rinfo pinfo rlist plist matches)))
                 (if (equal? new-matches matches)
-                    (loop (cdr prefs)) ; rejected → try next
+                    (loop (cdr prefs)) ; rejected -> try next
                     new-matches))))))
 
 (define (evaluate rinfo pinfo rlist plist matches)
@@ -192,7 +185,7 @@
       ;; resident not ranked by program -> reject
       ((not r-rank) matches)
 
-      ;; no match yet → create new
+      ;; no match yet -> create new
       ((not match)
        (cons (list pid (list (cons rid r-rank))) matches))
 
@@ -201,7 +194,7 @@
        (cons (add-resident-to-match (cons rid r-rank) match)
              (remove match matches)))
 
-      ;; full → compare worst
+      ;; full -> compare worst
       (else
         (let* ((current (cadr match))
                (worst (car current))) ; worst is first
@@ -214,4 +207,3 @@
                        plist
                        (cons updated (remove match matches))))
               matches))))))
-
