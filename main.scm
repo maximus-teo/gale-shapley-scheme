@@ -13,11 +13,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Given functions
 
-(read-residents "residentSmall.csv")
-(read-programs "programSmall.csv")
+(read-residents "assets/residentSmall.csv")
+(read-programs "assets/programSmall.csv")
 
-(define RLIST (read-residents "residentSmall.csv"))
-(define PLIST (read-programs "programSmall.csv"))
+(define RLIST (read-residents "assets/residentSmall.csv"))
+(define PLIST (read-programs "assets/programSmall.csv"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Helper functions
